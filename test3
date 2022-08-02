@@ -1,0 +1,29 @@
+pipeline {
+ agent any
+ stages {
+ stage('Git') {
+ steps {git branch: 'main', credentialsId: 'Yasher', url: 'git@github.com:Yasher/netology_8.2.git'}
+ }
+ stage('test go script')
+ {
+     steps {
+         sh 'rm go.mod'
+         sh '/usr/local/go/bin/go mod init ttt2'
+         sh '/usr/local/go/bin/go test ./...'
+     }
+ }
+  stage('build go bin')
+ {
+     steps {
+         sh '/usr/local/go/bin/go build -a -installsuffix nocgo -o ./app .'
+     }
+ }
+  stage('push file to nexus with build number')
+  {
+      steps {
+                    sh 'curl -X \'POST\' -u admin:pea647ch   \'http://127.0.0.1:8081/service/rest/v1/components?repository=mygorep\'   -H \'accept: application/json\'   -H \'Content-Type: multipart/form-data\'    -F \'raw.directory=final_\'$BUILD_NUMBER   -F \'raw.asset1=@app\'   -F \'raw.asset1.filename=app\''
+
+      }
+  }
+ }
+}
