@@ -1,0 +1,22 @@
+pipeline {
+ agent any
+ stages {
+ stage('Git') {
+ steps {git branch: 'main', credentialsId: 'Yasher', url: 'git@github.com:Yasher/netology_8.2.git'}
+ }
+ stage('test go script')
+ {
+     steps {
+         sh 'rm go.mod'
+         sh '/usr/local/go/bin/go mod init ttt2'
+         sh '/usr/local/go/bin/go test ./...'
+     }
+ }
+  stage('build docker')
+ {
+     steps {
+         sh 'docker build . -t ubuntu-bionic:8082/hello-world:test'
+     }
+ }
+ }
+}
